@@ -41,6 +41,11 @@ dev.db
 # vercel
 .vercel
 
+# AI agent files
+AGENTS.md
+CLAUDE.md
+.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
