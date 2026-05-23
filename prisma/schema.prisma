@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  currency  String   @default("USD")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  categories    Category[]
+  transactions  Transaction[]
+  budgets       Budget[]
+  subscriptions Subscription[]
+  accounts      Account[]
+
+  @@map("users")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String
+  type      String   // income | expense
+  color     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+  subscriptions Subscription[]
+
+  @@map("categories")
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String
+  type      String   // cash | bank | card | wallet
+  balance   Float    @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  categoryId      String?  @map("category_id")
+  amount          Float
+  type            String   // income | expense
+  description     String
+  transactionDate DateTime @map("transaction_date")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+model Budget {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  categoryId    String   @map("category_id")
+  month         Int
+  year          Int
+  plannedAmount Float    @map("planned_amount")
+  spentAmount   Float    @default(0) @map("spent_amount")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, month, year])
+  @@map("budgets")
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  name            String
+  amount          Float
+  billingCycle    String   @map("billing_cycle") // monthly | yearly
+  nextPaymentDate DateTime @map("next_payment_date")
+  categoryId      String?  @map("category_id")
+  status          String   @default("active") // active | paused | cancelled
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("subscriptions")
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Finanzas - Gestor Personal",
+  "short_name": "Finanzas",
+  "description": "Gestiona tus ingresos, gastos, presupuestos y suscripciones",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#09090b",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
