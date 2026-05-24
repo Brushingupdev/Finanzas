@@ -26,7 +26,7 @@ export function BottomTabBar() {
   const pathname = usePathname()
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-white safe-area-bottom">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-card pb-safe">
       <div className="flex h-14 items-center justify-around px-2">
         {TABS.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href))
@@ -36,7 +36,7 @@ export function BottomTabBar() {
               href={href}
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 py-1 rounded-lg transition-colors",
-                isActive ? "text-black" : "text-neutral-400 hover:text-neutral-600"
+                isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Icon className="h-5 w-5" />

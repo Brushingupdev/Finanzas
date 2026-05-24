@@ -26,10 +26,10 @@ function DashboardShellInner({ children, categories, currency }: DashboardShellP
   }
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-[100dvh] bg-background">
       <Sidebar />
       <main className="flex-1 overflow-y-auto pt-14 pb-16 lg:pt-0 lg:pb-0">
-        <div className="mx-auto max-w-6xl p-6 lg:p-8">{children}</div>
+        <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">{children}</div>
       </main>
       <BottomTabBar />
       <ReceiptScanner

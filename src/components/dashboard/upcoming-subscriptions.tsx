@@ -23,22 +23,22 @@ export function UpcomingSubscriptions({ subscriptions, currency }: UpcomingSubsc
 
   if (subscriptions.length === 0) {
     return (
-      <Card className="border shadow-sm transition-shadow hover:shadow-md">
+      <Card className="transition-shadow hover:shadow-md">
         <CardHeader className="pb-4 pt-6 px-6">
-          <CardTitle className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest">
+          <CardTitle className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
             Suscripciones
           </CardTitle>
         </CardHeader>
         <CardContent className="px-6 pb-6">
-          <div className="flex flex-col items-center justify-center gap-3 py-16">
-            <Repeat className="h-10 w-10 text-neutral-200" />
+          <div className="flex flex-col items-center justify-center gap-3 py-12">
+            <Repeat className="h-10 w-10 text-muted" />
             <div className="text-center space-y-1">
-              <p className="text-sm font-medium text-neutral-600">No hay suscripciones</p>
-              <p className="text-xs text-neutral-400">Registra tus pagos recurrentes</p>
+              <p className="text-sm font-medium text-foreground">No hay suscripciones</p>
+              <p className="text-xs text-muted-foreground">Registra tus pagos recurrentes</p>
             </div>
             <button
               onClick={() => router.push("/subscriptions")}
-              className="mt-2 flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-[13px] font-medium text-white transition-all hover:bg-neutral-800 active:scale-[0.97]"
+              className="mt-2 flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition-all hover:opacity-90 active:scale-[0.97]"
             >
               <Plus className="h-4 w-4" />
               Añadir suscripción
@@ -50,9 +50,9 @@ export function UpcomingSubscriptions({ subscriptions, currency }: UpcomingSubsc
   }
 
   return (
-    <Card className="border shadow-sm transition-shadow hover:shadow-md">
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader className="pb-4 pt-6 px-6">
-        <CardTitle className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest">
+        <CardTitle className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
           Suscripciones
         </CardTitle>
       </CardHeader>
@@ -61,22 +61,22 @@ export function UpcomingSubscriptions({ subscriptions, currency }: UpcomingSubsc
           {subscriptions.map((s) => (
             <div
               key={s.id}
-              className="group flex items-center justify-between rounded-xl px-3 py-3 transition-all hover:bg-neutral-50 cursor-pointer"
+              className="group flex items-center justify-between rounded-xl px-3 py-3 transition-all hover:bg-muted cursor-pointer"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-500">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                   <Repeat className="h-4 w-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-medium text-neutral-900">
+                  <p className="truncate text-[13px] font-medium text-foreground">
                     {s.name}
                   </p>
-                  <p className="text-[11px] text-neutral-400">
+                  <p className="text-[11px] text-muted-foreground">
                     {s.billingCycle === "monthly" ? "Mensual" : "Anual"} &middot; {formatDate(s.nextPaymentDate)}
                   </p>
                 </div>
               </div>
-              <span className="shrink-0 text-[13px] font-semibold text-neutral-900 tabular-nums">
+              <span className="shrink-0 text-[13px] font-semibold text-foreground tabular-nums">
                 {formatCurrency(s.amount, currency)}
               </span>
             </div>
@@ -85,4 +85,4 @@ export function UpcomingSubscriptions({ subscriptions, currency }: UpcomingSubsc
       </CardContent>
     </Card>
   )
-}
+  }

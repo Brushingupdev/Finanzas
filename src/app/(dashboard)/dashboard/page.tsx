@@ -76,24 +76,24 @@ export default function DashboardPage() {
   }))
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-20 lg:pb-0">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <h1 className="text-[22px] font-semibold tracking-tight text-neutral-900">Panel</h1>
-          <p className="text-[13px] text-neutral-500 capitalize">{monthName} {year} &middot; Resumen de tus finanzas</p>
+          <h1 className="text-[22px] font-semibold tracking-tight text-foreground">Panel</h1>
+          <p className="text-[13px] text-muted-foreground capitalize">{monthName} {year} &middot; Resumen de tus finanzas</p>
         </div>
         <div className="hidden sm:flex items-center gap-2">
           <button
             onClick={openScanner}
-            className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2 text-[13px] font-medium text-neutral-700 shadow-sm transition-all hover:bg-neutral-50 active:scale-[0.97]"
+            className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-[13px] font-medium text-foreground shadow-sm transition-all hover:bg-muted active:scale-[0.97]"
           >
             <Camera className="h-4 w-4" />
             Escanear recibo
           </button>
           <button
             onClick={() => router.push("/transactions")}
-            className="flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.97]"
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Nueva transacción
@@ -125,20 +125,20 @@ export default function DashboardPage() {
       </div>
 
       {/* Mobile FABs */}
-      <div className="fixed bottom-6 right-6 z-30 flex flex-col items-end gap-3 sm:hidden">
+      <div className="fixed bottom-20 right-6 z-30 flex flex-col items-end gap-3 sm:hidden">
         <button
           onClick={openScanner}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-neutral-800 shadow-lg border border-neutral-200 transition-transform hover:scale-105 active:scale-95"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-card text-foreground shadow-lg border border-border transition-transform hover:scale-105 active:scale-95"
         >
           <Camera className="h-5 w-5" />
         </button>
         <button
           onClick={() => router.push("/transactions")}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-6 w-6" />
         </button>
       </div>
     </div>
   )
-}
+  }

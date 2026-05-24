@@ -23,17 +23,17 @@ export function ExpensesChart({ data }: ExpensesChartProps) {
 
   if (mutedData.length === 0) {
     return (
-      <Card className="border shadow-sm transition-shadow hover:shadow-md">
+      <Card className="transition-shadow hover:shadow-md">
         <CardHeader className="pb-4 pt-6 px-6">
-          <CardTitle className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest">
+          <CardTitle className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
             Gastos por categoría
           </CardTitle>
         </CardHeader>
         <CardContent className="px-6 pb-6">
-          <div className="flex h-[280px] flex-col items-center justify-center gap-3 text-neutral-400">
-            <div className="h-16 w-16 rounded-full border-2 border-dashed border-neutral-200" />
+          <div className="flex h-[280px] flex-col items-center justify-center gap-3 text-muted-foreground">
+            <div className="h-16 w-16 rounded-full border-2 border-dashed border-border" />
             <p className="text-sm">Sin datos de gastos este mes</p>
-            <p className="text-xs text-neutral-400">Registra transacciones para ver el desglose</p>
+            <p className="text-xs text-muted-foreground">Registra transacciones para ver el desglose</p>
           </div>
         </CardContent>
       </Card>
@@ -41,9 +41,9 @@ export function ExpensesChart({ data }: ExpensesChartProps) {
   }
 
   return (
-    <Card className="border shadow-sm transition-shadow hover:shadow-md">
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader className="pb-4 pt-6 px-6">
-        <CardTitle className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest">
+        <CardTitle className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
           Gastos por categoría
         </CardTitle>
       </CardHeader>
@@ -58,13 +58,15 @@ export function ExpensesChart({ data }: ExpensesChartProps) {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #e4e4e7",
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
                   borderRadius: "10px",
-                  fontSize: 13,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                  padding: "10px 14px",
+                  fontSize: 12,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  padding: "8px 12px",
+                  color: "var(--foreground)",
                 }}
+                itemStyle={{ color: "var(--foreground)" }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -73,12 +75,12 @@ export function ExpensesChart({ data }: ExpensesChartProps) {
           {mutedData.map((d) => (
             <div key={d.name} className="flex items-center gap-2 text-xs">
               <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-              <span className="text-neutral-600">{d.name}</span>
-              <span className="text-neutral-400">${d.amount.toFixed(0)}</span>
+              <span className="text-muted-foreground">{d.name}</span>
+              <span className="font-medium text-foreground">${d.amount.toFixed(0)}</span>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
   )
-}
+  }
