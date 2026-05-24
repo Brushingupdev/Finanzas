@@ -17,7 +17,8 @@ export async function ensureOwnership(
   id: string,
   userId: string
 ): Promise<void> {
-  const record = await (prisma as Record<string, any>)[model].findUnique({ where: { id } })
+  const modelDelegate = (prisma as unknown as Record<string, { findUnique: (args: { where: { id: string } }) => Promise<{ userId: string } | null> }>)[model]
+  const record = await modelDelegate.findUnique({ where: { id } })
   if (!record) throw new NotFoundError()
   if (record.userId !== userId) throw new ForbiddenError()
 }

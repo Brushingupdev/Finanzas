@@ -68,6 +68,7 @@ export default function TransactionsPage() {
   const [form, setForm] = useState(emptyForm())
 
   const load = useCallback(async (append = false) => {
+    if (!append) setLoading(true)
     try {
       const params: Record<string, unknown> = {}
       if (filter !== "all") params.type = filter
@@ -77,7 +78,7 @@ export default function TransactionsPage() {
       params.limit = TRANSACTION_PAGE_SIZE
 
       const [txResult, catData, accData] = await Promise.all([
-        getTransactions(params as any),
+        getTransactions(params as Record<string, unknown>),
         append ? Promise.resolve(null) : getCategories(),
         append ? Promise.resolve(null) : getAccounts(),
       ])
@@ -97,9 +98,12 @@ export default function TransactionsPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [filter, dateFrom, dateTo, nextCursor]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filter, dateFrom, dateTo, nextCursor, toast])
 
-  useEffect(() => { setLoading(true); load() }, [filter, dateFrom, dateTo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load()
+  }, [load])
 
   const handleLoadMore = () => {
     setLoadingMore(true)

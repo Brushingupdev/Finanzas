@@ -135,7 +135,7 @@ export async function scanImage(
   const raw = response.choices[0]?.message?.content?.trim() ?? ""
 
   // Try to extract JSON from the response — the model may wrap it in markdown or add text
-  let jsonText = raw
+  const jsonText = raw
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/, "")
     .trim()

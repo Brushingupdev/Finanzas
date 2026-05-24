@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Plus, Pencil, Trash2, Wallet, Building2, CreditCard, Smartphone } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -45,10 +45,21 @@ export default function AccountsPage() {
   const [editing, setEditing] = useState<AccountItem | null>(null)
   const [form, setForm] = useState({ name: "", type: "bank" as AccountType, balance: "" })
 
-  const load = async () => {
-    try { setAccounts(await getAccounts()) } catch { toast("Error al cargar cuentas", "error") } finally { setLoading(false) }
-  }
-  useEffect(() => { load() }, [])
+  const load = useCallback(async () => {
+    try {
+      const data = await getAccounts()
+      setAccounts(data)
+    } catch {
+      toast("Error al cargar cuentas", "error")
+    } finally {
+      setLoading(false)
+    }
+  }, [toast])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load()
+  }, [load])
 
   const resetForm = () => { setForm({ name: "", type: "bank", balance: "" }); setEditing(null) }
 

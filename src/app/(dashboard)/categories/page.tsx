@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Trash2, Pencil, Plus } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,10 +27,21 @@ export default function CategoriesPage() {
   const [editing, setEditing] = useState<CategoryItem | null>(null)
   const [form, setForm] = useState({ name: "", type: "expense" as TransactionType, color: CATEGORY_COLORS[0] })
 
-  const load = async () => {
-    try { const data = await getCategories(); setCategories(data as CategoryItem[]) } catch { toast("Error al cargar categorías", "error") } finally { setLoading(false) }
-  }
-  useEffect(() => { load() }, [])
+  const load = useCallback(async () => {
+    try {
+      const data = await getCategories()
+      setCategories(data as CategoryItem[])
+    } catch {
+      toast("Error al cargar categorías", "error")
+    } finally {
+      setLoading(false)
+    }
+  }, [toast])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load()
+  }, [load])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

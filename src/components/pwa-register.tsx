@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 
 export function PWARegister() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [showInstall, setShowInstall] = useState(false)
 
