@@ -29,7 +29,7 @@ export async function getTransactions(params?: {
   const take = params?.limit ?? 20
   const data = await prisma.transaction.findMany({
     where,
-    include: { category: true },
+    include: { category: true, account: true },
     orderBy: [{ transactionDate: "desc" }, { id: "desc" }],
     take: take + 1,
     ...(params?.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
@@ -41,27 +41,46 @@ export async function getTransactions(params?: {
   return { data, nextCursor: hasMore ? data[data.length - 1].id : null }
 }
 
+function balanceDelta(amount: number, type: string): number {
+  return type === "income" ? amount : -amount
+}
+
+async function adjustAccountBalance(accountId: string, delta: number) {
+  await prisma.account.update({
+    where: { id: accountId },
+    data: { balance: { increment: delta } },
+  })
+}
+
 export async function createTransaction(input: {
   amount: number
   type: TransactionType
   description: string
   category_id?: string
+  account_id?: string
   transaction_date: string
 }) {
   const userId = await getUserId()
   const validated = transactionSchema.parse(input)
 
-  return prisma.transaction.create({
+  const tx = await prisma.transaction.create({
     data: {
       userId,
       amount: validated.amount,
       type: validated.type,
       description: validated.description,
       categoryId: validated.category_id || null,
+      accountId: validated.account_id || null,
       transactionDate: new Date(validated.transaction_date),
     },
-    include: { category: true },
+    include: { category: true, account: true },
   })
+
+  if (validated.account_id) {
+    await adjustAccountBalance(validated.account_id, balanceDelta(tx.amount, tx.type))
+  }
+
+  return tx
 }
 
 export async function updateTransaction(
@@ -71,22 +90,44 @@ export async function updateTransaction(
     type: TransactionType
     description: string
     categoryId: string | null
+    accountId: string | null
     transactionDate: Date
   }>
 ) {
   const userId = await getUserId()
   await ensureOwnership("transaction", id, userId)
 
-  return prisma.transaction.update({
+  const old = await prisma.transaction.findUnique({ where: { id }, select: { accountId: true, amount: true, type: true } })
+  if (!old) throw new Error("Transacción no encontrada")
+
+  const tx = await prisma.transaction.update({
     where: { id },
     data: input,
-    include: { category: true },
+    include: { category: true, account: true },
   })
+
+  // Revert old balance effect
+  if (old.accountId) {
+    await adjustAccountBalance(old.accountId, -balanceDelta(old.amount, old.type))
+  }
+  // Apply new balance effect
+  if (tx.accountId) {
+    await adjustAccountBalance(tx.accountId, balanceDelta(tx.amount, tx.type))
+  }
+
+  return tx
 }
 
 export async function deleteTransaction(id: string) {
   const userId = await getUserId()
   await ensureOwnership("transaction", id, userId)
 
-  return prisma.transaction.delete({ where: { id } })
+  const tx = await prisma.transaction.findUnique({ where: { id }, select: { accountId: true, amount: true, type: true } })
+  if (!tx) throw new Error("Transacción no encontrada")
+
+  await prisma.transaction.delete({ where: { id } })
+
+  if (tx.accountId) {
+    await adjustAccountBalance(tx.accountId, -balanceDelta(tx.amount, tx.type))
+  }
 }

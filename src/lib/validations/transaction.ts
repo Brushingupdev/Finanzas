@@ -5,6 +5,7 @@ export const transactionSchema = z.object({
   type: z.enum(["income", "expense"]),
   description: z.string().min(1, "La descripción es obligatoria"),
   category_id: z.string().optional(),
+  account_id: z.string().optional(),
   transaction_date: z.string().min(1, "La fecha es obligatoria"),
 })
 

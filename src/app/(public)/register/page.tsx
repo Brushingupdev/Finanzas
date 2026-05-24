@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { CURRENCIES } from "@/lib/constants"
+import { register } from "@/features/auth/auth"
 import type { Currency } from "@/types"
 
 export default function RegisterPage() {
@@ -23,11 +24,11 @@ export default function RegisterPage() {
     setError("")
     setLoading(true)
     try {
-      const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) })
-      if (!res.ok) { const data = await res.json(); throw new Error(data.error || "Error") }
+      const result = await register(form)
+      if (result.error) { setError(result.error); return }
       await signIn("credentials", { email: form.email, password: form.password, redirect: false })
       router.push("/dashboard"); router.refresh()
-    } catch (err) { setError(err instanceof Error ? err.message : "Error") }
+    } catch { setError("Error al registrarse") }
     finally { setLoading(false) }
   }
 

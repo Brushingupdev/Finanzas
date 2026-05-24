@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/modal"
 import { useToast } from "@/components/ui/toast"
 import { getTransactions, createTransaction, updateTransaction, deleteTransaction } from "@/features/transactions/transactions"
 import { getCategories } from "@/features/categories/categories"
+import { getAccounts } from "@/features/accounts/accounts"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { TRANSACTION_PAGE_SIZE } from "@/lib/constants"
 import { useCurrency } from "@/hooks/use-currency"
@@ -22,7 +23,9 @@ interface TransactionItem {
   description: string
   transactionDate: Date | string
   categoryId?: string | null
+  accountId?: string | null
   category: { id: string; name: string; color: string } | null
+  account: { id: string; name: string; type: string } | null
 }
 
 interface CategoryItem {
@@ -32,11 +35,19 @@ interface CategoryItem {
   color: string
 }
 
+interface AccountItem {
+  id: string
+  name: string
+  type: string
+  balance: number
+}
+
 const emptyForm = () => ({
   amount: "",
   type: "expense" as TransactionType,
   description: "",
   category_id: "",
+  account_id: "",
   transaction_date: new Date().toISOString().split("T")[0],
 })
 
@@ -45,6 +56,7 @@ export default function TransactionsPage() {
   const currency = useCurrency()
   const [transactions, setTransactions] = useState<TransactionItem[]>([])
   const [categories, setCategories] = useState<CategoryItem[]>([])
+  const [accounts, setAccounts] = useState<AccountItem[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -64,9 +76,10 @@ export default function TransactionsPage() {
       if (append && nextCursor) params.cursor = nextCursor
       params.limit = TRANSACTION_PAGE_SIZE
 
-      const [txResult, catData] = await Promise.all([
+      const [txResult, catData, accData] = await Promise.all([
         getTransactions(params as any),
         append ? Promise.resolve(null) : getCategories(),
+        append ? Promise.resolve(null) : getAccounts(),
       ])
 
       const result = txResult as { data: TransactionItem[]; nextCursor: string | null }
@@ -77,6 +90,7 @@ export default function TransactionsPage() {
       }
       setNextCursor(result.nextCursor)
       if (catData) setCategories(catData as CategoryItem[])
+      if (accData) setAccounts(accData as AccountItem[])
     } catch {
       toast("Error al cargar las transacciones", "error")
     } finally {
@@ -105,6 +119,7 @@ export default function TransactionsPage() {
       type: t.type as TransactionType,
       description: t.description,
       category_id: t.categoryId ?? "",
+      account_id: t.accountId ?? "",
       transaction_date: new Date(t.transactionDate).toISOString().split("T")[0],
     })
     setShowModal(true)
@@ -119,6 +134,7 @@ export default function TransactionsPage() {
           type: form.type,
           description: form.description,
           categoryId: form.category_id || null,
+          accountId: form.account_id || null,
           transactionDate: new Date(form.transaction_date),
         })
         toast("Transacción actualizada")
@@ -128,6 +144,7 @@ export default function TransactionsPage() {
           type: form.type,
           description: form.description,
           category_id: form.category_id || undefined,
+          account_id: form.account_id || undefined,
           transaction_date: form.transaction_date,
         })
         toast("Transacción creada")
@@ -197,7 +214,7 @@ export default function TransactionsPage() {
             <div className="space-y-0.5">
               <p className="text-sm font-medium text-black">{t.description}</p>
               <p className="text-xs text-neutral-400">
-                {t.category?.name ?? "Sin categoría"} &middot; {formatDate(new Date(t.transactionDate).toISOString().split("T")[0])}
+                {t.category?.name ?? "Sin categoría"}{t.account ? ` · ${t.account.name}` : ""} &middot; {formatDate(new Date(t.transactionDate).toISOString().split("T")[0])}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -257,6 +274,12 @@ export default function TransactionsPage() {
             value={form.category_id}
             onChange={(e) => setForm({ ...form, category_id: e.target.value })}
             options={[{ value: "", label: "Sin categoría" }, ...categories.map((c) => ({ value: c.id, label: c.name }))]}
+          />
+          <Select
+            label="Cuenta"
+            value={form.account_id}
+            onChange={(e) => setForm({ ...form, account_id: e.target.value })}
+            options={[{ value: "", label: "Sin cuenta" }, ...accounts.map((a) => ({ value: a.id, label: a.name }))]}
           />
           <Input
             label="Fecha"

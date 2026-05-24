@@ -8,16 +8,16 @@ const STATIC_ASSETS = [
   "/icon.svg",
 ]
 
-self.addEventListener("install", (event: ExtendableEvent) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS)
     })
   )
-  ;(self as unknown as ServiceWorkerGlobalScope).skipWaiting()
+  self.skipWaiting()
 })
 
-self.addEventListener("activate", (event: ExtendableEvent) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -25,10 +25,10 @@ self.addEventListener("activate", (event: ExtendableEvent) => {
       )
     })
   )
-  ;(self as unknown as ServiceWorkerGlobalScope).clients.claim()
+  self.clients.claim()
 })
 
-self.addEventListener("fetch", (event: FetchEvent) => {
+self.addEventListener("fetch", (event) => {
   // Skip non-GET requests and API calls
   if (event.request.method !== "GET") return
   if (event.request.url.includes("/api/")) return
@@ -56,7 +56,7 @@ self.addEventListener("fetch", (event: FetchEvent) => {
         .catch(() => {
           // Fallback for navigation requests
           if (event.request.mode === "navigate") {
-            return caches.match("/dashboard") as Promise<Response>
+            return caches.match("/dashboard")
           }
           return new Response("Offline", { status: 503 })
         })

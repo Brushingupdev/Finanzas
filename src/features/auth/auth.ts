@@ -21,6 +21,14 @@ export async function register(input: {
   currency: string
 }) {
   const validated = registerSchema.parse(input)
+
+  const existing = await prisma.user.findUnique({
+    where: { email: validated.email },
+  })
+  if (existing) {
+    return { error: "Este correo ya está registrado" }
+  }
+
   const hashedPassword = await bcrypt.hash(validated.password, 12)
 
   await prisma.user.create({
@@ -32,9 +40,5 @@ export async function register(input: {
     },
   })
 
-  await signIn("credentials", {
-    email: validated.email,
-    password: validated.password,
-    redirectTo: "/dashboard",
-  })
+  return { success: true }
 }
