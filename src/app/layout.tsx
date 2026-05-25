@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
       </head>
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950">
         <Providers>{children}</Providers>

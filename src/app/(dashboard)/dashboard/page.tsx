@@ -27,6 +27,16 @@ export default function DashboardPage() {
     async function load() {
       try {
         const res = await fetch("/api/dashboard/stats", { method: "GET", cache: "no-store" })
+        if (res.status === 401) {
+          router.replace("/login")
+          return
+        }
+
+        const contentType = res.headers.get("content-type") ?? ""
+        if (!contentType.includes("application/json")) {
+          throw new Error("Respuesta inválida del servidor")
+        }
+
         const data = await res.json()
         if (!res.ok) {
           throw new Error(data?.error || "Error al cargar el panel")
@@ -39,7 +49,7 @@ export default function DashboardPage() {
       }
     }
     load()
-  }, [])
+  }, [router])
 
   if (loading) {
     return (
