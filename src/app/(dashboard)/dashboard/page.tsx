@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getDashboardStats } from "@/features/reports/reports"
 import { StatsCards } from "@/components/dashboard/stats-cards"
 import { MonthlyChart } from "@/components/dashboard/monthly-chart"
 import { ExpensesChart } from "@/components/dashboard/expenses-chart"
@@ -27,7 +26,11 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const data = await getDashboardStats()
+        const res = await fetch("/api/dashboard/stats", { method: "GET", cache: "no-store" })
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data?.error || "Error al cargar el panel")
+        }
         setStats(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al cargar el panel")
