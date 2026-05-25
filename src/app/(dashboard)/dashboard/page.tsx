@@ -10,7 +10,6 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions"
 import { UpcomingSubscriptions } from "@/components/dashboard/upcoming-subscriptions"
 import { PaymentAlert } from "@/components/dashboard/payment-alert"
 import { useScanner } from "@/components/scanner-context"
-import { getCategories } from "@/features/categories/categories"
 import type { DashboardStats } from "@/types"
 import { Plus, Camera } from "lucide-react"
 

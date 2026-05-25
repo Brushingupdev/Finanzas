@@ -8,9 +8,6 @@ import {
   PieChart,
   BarChart3,
   Repeat,
-  Tag,
-  Building2,
-  Settings,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 

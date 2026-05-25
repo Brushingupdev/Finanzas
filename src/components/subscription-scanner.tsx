@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useRef, useCallback } from "react"
 import { createSubscription } from "@/features/subscriptions/subscriptions"
 import { scanImage } from "@/lib/ai-scanner"
@@ -89,7 +90,7 @@ export function SubscriptionScanner({ open, onClose, onCreated, currency, catego
       setError(err instanceof Error ? err.message : "Error al analizar la imagen")
       goToManual()
     }
-  }, [goToManual])
+  }, [goToManual, categories, currency])
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -164,7 +165,14 @@ export function SubscriptionScanner({ open, onClose, onCreated, currency, catego
           <div className="space-y-4">
             {previewUrl && (
               <div className="relative overflow-hidden rounded-xl border border-neutral-200">
-                <img src={previewUrl} alt="Captura" className="w-full max-h-[220px] object-contain bg-neutral-50" />
+                <Image
+                  src={previewUrl}
+                  alt="Captura"
+                  width={1200}
+                  height={700}
+                  unoptimized
+                  className="w-full max-h-[220px] object-contain bg-neutral-50"
+                />
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-[2px]">
                   <Sparkles className="h-7 w-7 animate-pulse text-white" />
                   <p className="mt-2 text-sm font-medium text-white">Analizando con Gemini...</p>

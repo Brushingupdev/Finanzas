@@ -12,7 +12,6 @@ import {
   Repeat,
   Tag,
   Settings,
-  LogOut,
   Wallet,
   Building2,
   Menu,
