@@ -3,9 +3,13 @@ import { prisma } from "@/lib/prisma"
 import { DashboardShell } from "./dashboard-shell"
 import type { Currency } from "@/types"
 
+import { redirect } from "next/navigation"
+
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
-  if (!session?.user?.id) return <>{children}</>
+  if (!session?.user?.id) {
+    redirect("/login")
+  }
 
   const [categories, user] = await Promise.all([
     prisma.category.findMany({
