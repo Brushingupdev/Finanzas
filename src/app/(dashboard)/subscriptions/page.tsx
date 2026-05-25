@@ -159,29 +159,34 @@ export default function SubscriptionsPage() {
         ))}
       </div>
 
-      <div className="divide-y rounded-md border">
+      <div className="divide-y rounded-md border bg-white shadow-sm overflow-hidden">
         {subscriptions.map((s) => (
-          <div key={s.id} className="flex items-center justify-between p-4 bg-white hover:bg-neutral-50 transition-colors">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-black">{s.name}</p>
-                {statusBadge(s.status)}
-              </div>
-              <p className="text-xs text-neutral-400">
-                {s.billingCycle === "monthly" ? "Mensual" : "Anual"} &middot;{" "}
-                {formatDate(new Date(s.nextPaymentDate).toISOString().split("T")[0])}
+          <div key={s.id} className="flex items-center justify-between p-3 sm:p-4 bg-white hover:bg-neutral-50 transition-colors gap-3">
+            <div className="space-y-0.5 min-w-0 flex-1">
+              <p className="text-sm font-medium text-black truncate">{s.name}</p>
+              <p className="text-xs text-neutral-400 truncate">
+                {s.category?.name ?? "Sin categoría"} &middot; {s.billingCycle === "monthly" ? "Mensual" : "Anual"} &middot; {formatDate(new Date(s.nextPaymentDate).toISOString().split("T")[0])}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-black">{formatCurrency(Number(s.amount), currency)}</span>
-              <Button variant="ghost" size="sm" onClick={() => toggleStatus(s)}>
-                {s.status === "active"
-                  ? <PauseCircle className="h-4 w-4 text-neutral-400" />
-                  : <PlayCircle className="h-4 w-4 text-neutral-400" />}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(s.id)}>
-                <Trash2 className="h-3.5 w-3.5 text-neutral-400" />
-              </Button>
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+              <div className="text-right">
+                <span className="text-sm sm:text-base font-semibold text-black tabular-nums">
+                  {formatCurrency(Number(s.amount), currency)}
+                </span>
+                <p className={`text-[10px] sm:text-xs font-medium uppercase tracking-wider ${s.status === "active" ? "text-emerald-500" : s.status === "paused" ? "text-amber-500" : "text-neutral-400"}`}>
+                  {s.status === "active" ? "Activa" : s.status === "paused" ? "Pausada" : "Cancelada"}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => toggleStatus(s)}>
+                  {s.status === "active"
+                    ? <PauseCircle className="h-4 w-4 text-neutral-500" />
+                    : <PlayCircle className="h-4 w-4 text-neutral-500" />}
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(s.id)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}

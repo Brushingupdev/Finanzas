@@ -189,47 +189,51 @@ export default function TransactionsPage() {
         <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" /> Añadir</Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 scrollbar-hide w-[calc(100%+2rem)] sm:w-auto">
         {(["all", "income", "expense"] as const).map((f) => (
-          <Button key={f} variant={filter === f ? "primary" : "secondary"} size="sm" onClick={() => setFilter(f)}>
+          <Button key={f} variant={filter === f ? "primary" : "secondary"} size="sm" onClick={() => setFilter(f)} className="shrink-0">
             {f === "all" ? "Todas" : f === "income" ? "Ingresos" : "Gastos"}
           </Button>
         ))}
-        <div className="h-5 w-px bg-neutral-200" />
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
-          className="h-8 rounded-md border border-neutral-200 px-2.5 text-xs text-neutral-600"
-        />
-        <span className="text-xs text-neutral-400">a</span>
-        <input
-          type="date"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
-          className="h-8 rounded-md border border-neutral-200 px-2.5 text-xs text-neutral-600"
-        />
+        <div className="h-5 w-px bg-neutral-200 shrink-0 hidden sm:block" />
+        <div className="flex items-center gap-2 shrink-0 bg-neutral-50 p-1 rounded-lg border border-neutral-100 sm:bg-transparent sm:border-0 sm:p-0">
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="h-8 rounded-md border border-neutral-200 bg-white px-2.5 text-xs text-neutral-600 w-[110px] sm:w-auto"
+          />
+          <span className="text-xs text-neutral-400">a</span>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="h-8 rounded-md border border-neutral-200 bg-white px-2.5 text-xs text-neutral-600 w-[110px] sm:w-auto"
+          />
+        </div>
       </div>
 
-      <div className="divide-y rounded-md border">
+      <div className="divide-y rounded-md border bg-white shadow-sm overflow-hidden">
         {transactions.map((t) => (
-          <div key={t.id} className="flex items-center justify-between p-4 bg-white hover:bg-neutral-50 transition-colors">
-            <div className="space-y-0.5">
-              <p className="text-sm font-medium text-black">{t.description}</p>
-              <p className="text-xs text-neutral-400">
+          <div key={t.id} className="flex items-center justify-between p-3 sm:p-4 bg-white hover:bg-neutral-50 transition-colors gap-3">
+            <div className="space-y-0.5 min-w-0 flex-1">
+              <p className="text-sm font-medium text-black truncate">{t.description}</p>
+              <p className="text-xs text-neutral-400 truncate">
                 {t.category?.name ?? "Sin categoría"}{t.account ? ` · ${t.account.name}` : ""} &middot; {formatDate(new Date(t.transactionDate).toISOString().split("T")[0])}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={`text-sm font-medium ${t.type === "income" ? "text-black" : "text-neutral-500"}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center items-end gap-2 sm:gap-4 shrink-0">
+              <span className={`text-sm sm:text-base font-semibold tabular-nums ${t.type === "income" ? "text-emerald-600" : "text-red-500"}`}>
                 {t.type === "income" ? "+" : "−"}{formatCurrency(Number(t.amount), currency)}
               </span>
-              <Button variant="ghost" size="sm" onClick={() => openEdit(t)}>
-                <Pencil className="h-3.5 w-3.5 text-neutral-400" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleDelete(t.id)}>
-                <Trash2 className="h-3.5 w-3.5 text-neutral-400" />
-              </Button>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => openEdit(t)}>
+                  <Pencil className="h-3.5 w-3.5 text-neutral-500" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(t.id)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}
