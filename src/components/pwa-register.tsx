@@ -17,7 +17,10 @@ export function PWARegister() {
     window.addEventListener("beforeinstallprompt", handler)
 
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {})
+      navigator.serviceWorker
+        .register("/sw.js", { updateViaCache: "none" })
+        .then((registration) => registration.update())
+        .catch(() => {})
     }
 
     return () => window.removeEventListener("beforeinstallprompt", handler)

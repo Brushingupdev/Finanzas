@@ -1,12 +1,5 @@
-const CACHE_NAME = "finanzas-v1"
-const STATIC_ASSETS = [
-  "/",
-  "/dashboard",
-  "/login",
-  "/register",
-  "/manifest.json",
-  "/icon.svg",
-]
+const CACHE_NAME = "finanzas-v2"
+const STATIC_ASSETS = ["/manifest.json", "/icon.svg"]
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -33,33 +26,29 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return
   if (event.request.url.includes("/api/")) return
 
+  // Always use network for navigations to avoid stale HTML that can reference old Server Action IDs.
+  if (event.request.mode === "navigate") {
+    event.respondWith(fetch(event.request))
+    return
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached
-      return fetch(event.request)
-        .then((response) => {
-          // Cache successful responses for static assets
-          if (
-            response.status === 200 &&
-            (event.request.destination === "script" ||
-              event.request.destination === "style" ||
-              event.request.destination === "image" ||
-              event.request.destination === "document")
-          ) {
-            const clone = response.clone()
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, clone)
-            })
-          }
-          return response
-        })
-        .catch(() => {
-          // Fallback for navigation requests
-          if (event.request.mode === "navigate") {
-            return caches.match("/dashboard")
-          }
-          return new Response("Offline", { status: 503 })
-        })
-    })
+    fetch(event.request)
+      .then((response) => {
+        if (
+          response.status === 200 &&
+          (event.request.destination === "script" ||
+            event.request.destination === "style" ||
+            event.request.destination === "image" ||
+            event.request.destination === "font")
+        ) {
+          const clone = response.clone()
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, clone)
+          })
+        }
+        return response
+      })
+      .catch(() => caches.match(event.request).then((cached) => cached || new Response("Offline", { status: 503 })))
   )
 })
