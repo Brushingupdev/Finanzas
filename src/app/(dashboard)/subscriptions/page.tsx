@@ -178,12 +178,12 @@ export default function SubscriptionsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-1 sm:gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => toggleStatus(s)}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full px-0" onClick={() => toggleStatus(s)}>
                   {s.status === "active"
                     ? <PauseCircle className="h-4 w-4 text-neutral-500" />
                     : <PlayCircle className="h-4 w-4 text-neutral-500" />}
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(s.id)}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full px-0 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(s.id)}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>

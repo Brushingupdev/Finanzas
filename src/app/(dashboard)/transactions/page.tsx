@@ -227,10 +227,10 @@ export default function TransactionsPage() {
                 {t.type === "income" ? "+" : "−"}{formatCurrency(Number(t.amount), currency)}
               </span>
               <div className="flex items-center gap-1 sm:gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => openEdit(t)}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full px-0" onClick={() => openEdit(t)}>
                   <Pencil className="h-3.5 w-3.5 text-neutral-500" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(t.id)}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full px-0 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(t.id)}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
