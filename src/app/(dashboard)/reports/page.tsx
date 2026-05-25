@@ -3,5 +3,9 @@ import ReportsClient from "./reports-client"
 
 export default async function ReportsPage() {
   const data = await getReportData()
-  return <ReportsClient initialData={data as any} />
+  
+  // Serialize any potential Date objects to strings for the Client Component
+  const serializedData = JSON.parse(JSON.stringify(data))
+  
+  return <ReportsClient initialData={serializedData} />
 }
