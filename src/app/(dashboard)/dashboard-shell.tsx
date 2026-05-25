@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { BottomTabBar } from "@/components/dashboard/bottom-tab-bar"
 import { ReceiptScanner } from "@/components/receipt-scanner"
 import { ScannerProvider, useScanner } from "@/components/scanner-context"
+import { CurrencyProvider } from "@/hooks/use-currency"
 import type { Currency } from "@/types"
 
 interface DashboardShellProps {
@@ -26,19 +27,21 @@ function DashboardShellInner({ children, categories, currency }: DashboardShellP
   }
 
   return (
-    <div className="flex h-[100dvh] bg-background">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto pt-14 pb-16 lg:pt-0 lg:pb-0">
-        <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">{children}</div>
-      </main>
-      <BottomTabBar />
-      <ReceiptScanner
-        open={open}
-        onClose={closeScanner}
-        currency={currency}
-        categories={categories}
-      />
-    </div>
+    <CurrencyProvider currency={currency}>
+      <div className="flex h-[100dvh] bg-background">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto pt-14 pb-16 lg:pt-0 lg:pb-0">
+          <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">{children}</div>
+        </main>
+        <BottomTabBar />
+        <ReceiptScanner
+          open={open}
+          onClose={closeScanner}
+          currency={currency}
+          categories={categories}
+        />
+      </div>
+    </CurrencyProvider>
   )
 }
 

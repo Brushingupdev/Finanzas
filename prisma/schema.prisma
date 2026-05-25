@@ -79,7 +79,6 @@ model Budget {
   month         Int
   year          Int
   plannedAmount Float    @map("planned_amount")
-  spentAmount   Float    @default(0) @map("spent_amount")
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)

@@ -83,18 +83,6 @@ export async function markSubscriptionPaid(id: string) {
 
   const today = new Date()
 
-  // Create transaction for this payment
-  await prisma.transaction.create({
-    data: {
-      userId,
-      amount: sub.amount,
-      type: "expense",
-      description: sub.name,
-      categoryId: sub.categoryId,
-      transactionDate: today,
-    },
-  })
-
   // Calculate next payment date
   const currentNext = new Date(sub.nextPaymentDate)
   const nextDate = new Date(currentNext)
@@ -104,10 +92,24 @@ export async function markSubscriptionPaid(id: string) {
     nextDate.setMonth(nextDate.getMonth() + 1)
   }
 
-  return prisma.subscription.update({
-    where: { id },
-    data: { nextPaymentDate: nextDate },
-    include: { category: true },
+  return prisma.$transaction(async (tx) => {
+    // Create transaction for this payment
+    await tx.transaction.create({
+      data: {
+        userId,
+        amount: sub.amount,
+        type: "expense",
+        description: sub.name,
+        categoryId: sub.categoryId,
+        transactionDate: today,
+      },
+    })
+
+    return tx.subscription.update({
+      where: { id },
+      data: { nextPaymentDate: nextDate },
+      include: { category: true },
+    })
   })
 }
 

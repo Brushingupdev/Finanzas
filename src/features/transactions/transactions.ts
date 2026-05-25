@@ -45,13 +45,6 @@ function balanceDelta(amount: number, type: string): number {
   return type === "income" ? amount : -amount
 }
 
-async function adjustAccountBalance(accountId: string, delta: number) {
-  await prisma.account.update({
-    where: { id: accountId },
-    data: { balance: { increment: delta } },
-  })
-}
-
 export async function createTransaction(input: {
   amount: number
   type: TransactionType
@@ -63,24 +56,29 @@ export async function createTransaction(input: {
   const userId = await getUserId()
   const validated = transactionSchema.parse(input)
 
-  const tx = await prisma.transaction.create({
-    data: {
-      userId,
-      amount: validated.amount,
-      type: validated.type,
-      description: validated.description,
-      categoryId: validated.category_id || null,
-      accountId: validated.account_id || null,
-      transactionDate: new Date(validated.transaction_date),
-    },
-    include: { category: true, account: true },
+  return prisma.$transaction(async (tx) => {
+    const created = await tx.transaction.create({
+      data: {
+        userId,
+        amount: validated.amount,
+        type: validated.type,
+        description: validated.description,
+        categoryId: validated.category_id || null,
+        accountId: validated.account_id || null,
+        transactionDate: new Date(validated.transaction_date),
+      },
+      include: { category: true, account: true },
+    })
+
+    if (validated.account_id) {
+      await tx.account.update({
+        where: { id: validated.account_id },
+        data: { balance: { increment: balanceDelta(created.amount, created.type) } },
+      })
+    }
+
+    return created
   })
-
-  if (validated.account_id) {
-    await adjustAccountBalance(validated.account_id, balanceDelta(tx.amount, tx.type))
-  }
-
-  return tx
 }
 
 export async function updateTransaction(
@@ -100,34 +98,47 @@ export async function updateTransaction(
   const old = await prisma.transaction.findUnique({ where: { id }, select: { accountId: true, amount: true, type: true } })
   if (!old) throw new Error("Transacción no encontrada")
 
-  const tx = await prisma.transaction.update({
-    where: { id },
-    data: input,
-    include: { category: true, account: true },
+  return prisma.$transaction(async (tx) => {
+    const updated = await tx.transaction.update({
+      where: { id },
+      data: input,
+      include: { category: true, account: true },
+    })
+
+    // Revert old balance effect
+    if (old.accountId) {
+      await tx.account.update({
+        where: { id: old.accountId },
+        data: { balance: { increment: -balanceDelta(old.amount, old.type) } },
+      })
+    }
+    // Apply new balance effect
+    if (updated.accountId) {
+      await tx.account.update({
+        where: { id: updated.accountId },
+        data: { balance: { increment: balanceDelta(updated.amount, updated.type) } },
+      })
+    }
+
+    return updated
   })
-
-  // Revert old balance effect
-  if (old.accountId) {
-    await adjustAccountBalance(old.accountId, -balanceDelta(old.amount, old.type))
-  }
-  // Apply new balance effect
-  if (tx.accountId) {
-    await adjustAccountBalance(tx.accountId, balanceDelta(tx.amount, tx.type))
-  }
-
-  return tx
 }
 
 export async function deleteTransaction(id: string) {
   const userId = await getUserId()
   await ensureOwnership("transaction", id, userId)
 
-  const tx = await prisma.transaction.findUnique({ where: { id }, select: { accountId: true, amount: true, type: true } })
-  if (!tx) throw new Error("Transacción no encontrada")
+  const existing = await prisma.transaction.findUnique({ where: { id }, select: { accountId: true, amount: true, type: true } })
+  if (!existing) throw new Error("Transacción no encontrada")
 
-  await prisma.transaction.delete({ where: { id } })
+  await prisma.$transaction(async (tx) => {
+    await tx.transaction.delete({ where: { id } })
 
-  if (tx.accountId) {
-    await adjustAccountBalance(tx.accountId, -balanceDelta(tx.amount, tx.type))
-  }
+    if (existing.accountId) {
+      await tx.account.update({
+        where: { id: existing.accountId },
+        data: { balance: { increment: -balanceDelta(existing.amount, existing.type) } },
+      })
+    }
+  })
 }
